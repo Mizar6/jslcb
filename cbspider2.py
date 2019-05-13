@@ -27,7 +27,7 @@ class JSL:
     # 传入is_ssl的值,1为使用ssl认证,0为禁用ssl认证
     # 传入single_line的值,1为获取单行数据,2为获取双行数据,默认为0获取所有数据
     # 传入premium_rate,溢价率,默认为8
-    # 传入rateofreturn,税前收益率，默认为2
+    # 传入rateofreturn,到期税前收益率，默认为2
     def __init__(self, url, filename, is_ssl, single_line=0, premium_rate=8.00, rateofreturn=2.00):
         # 爬虫的url
         self.url = url
