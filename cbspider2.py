@@ -49,7 +49,7 @@ class JSL:
         # SMTP服务器地址:
         self.smtp_server = 'smtp.163.com'
         # 收件人地址:
-        self.to_addr = 'zky128@qq.com'
+        self.to_addr = 'hellowhu@qq.com'
         # 调用setSsl方法
         self.setSsl()
 
