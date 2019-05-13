@@ -119,7 +119,7 @@ class JSL:
         msg['From'] = _format_addr(u'Spider_jisilu_4爬虫通知<%s>' % from_addr)
         msg['To'] = _format_addr(u'管理员<%s>' % to_addr)
         msg['Subject'] = Header(u'Hi...如下内容符合筛选条件:'
-                                +u'溢价率小于'+ str(self.premium_rate)+'%'+u'收益率大于'+str(self.rateofreturn)+'%', 'utf-8').encode()
+                                +u'溢价率小于'+ str(self.premium_rate)+'%'+u',收益率大于'+str(self.rateofreturn)+'%', 'utf-8').encode()
 
         server = smtplib.SMTP_SSL(smtp_server, 465)  # 启用SSL发信, 端口一般是465
         # server = smtplib.SMTP(smtp_server, 25) 	# SMTP协议默认端口是25
