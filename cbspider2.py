@@ -45,11 +45,10 @@ class JSL:
         self.xpath = '/html/body/div[3]/div[1]/div[1]/table/tbody/tr'
         # Email地址和口令:
         self.from_addr = 'hellowhu@163.com'
-        self.password = 'young888'
+        self.password = 'jslspider163'
         # SMTP服务器地址:
         self.smtp_server = 'smtp.163.com'
         # 收件人地址:
-        #self.to_addr = 'gjycos829@qq.com'
         self.to_addr = 'zky128@qq.com'
         # 调用setSsl方法
         self.setSsl()
