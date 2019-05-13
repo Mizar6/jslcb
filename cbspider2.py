@@ -37,7 +37,7 @@ class JSL:
         self.ssl = is_ssl
         # 设置获取哪些行
         self.single_line = single_line
-        # 设置预设到溢价率和税前收益率
+        # 设置预设筛选条件：溢价率和税前收益率
         self.premium_rate = premium_rate;
         self.rateofreturn = rateofreturn;
         # 定义xpath
@@ -140,7 +140,7 @@ class JSL:
                 rate1 = float(line.split()[10][:-1])  # 溢价率，取出百分号的数字,并转成float类型
                 rate2 = float(line.split()[20][:-1])  # 税前收益率，取出百分号的数字,并转成float类型
                 price = float(line.split()[2])  # 当前价格
-            if rate1 < self.premium_rate and rate2 > self.rateofreturn:  # 判断涨幅是否大于预设阈值
+            if rate1 < self.premium_rate and rate2 > self.rateofreturn:  # 根据预设条件进行筛选
                 notice_content = line.split()[0] + line.split()[1] \
                                  +' 当前价格'+str(price)+ ' 溢价率为' + str(rate1)+'%' +' 税前收益率为'+ str(rate2)+'%' +"\n"
                 notice_contents.append(notice_content)
