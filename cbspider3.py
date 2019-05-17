@@ -6,10 +6,8 @@
 
 import ssl
 from selenium import webdriver
-from email import encoders
 from email.mime.text import MIMEText
 from email.header import Header
-from email.utils import parseaddr, formataddr
 import smtplib
 
 
@@ -22,23 +20,25 @@ class JSL:
     # 传入url
     # 传入filename文件名
     # 传入is_ssl的值,1为使用ssl认证,0为禁用ssl认证
-    # 传入single_line的值,1为获取单行数据,2为获取双行数据,默认为0获取所有数据
+    # # 传入Write_in的值，1时写入，0时不写入
     # 传入premium_rate,溢价率,默认为8
     # 传入rateofreturn,到期税前收益率，默认为2
-    def __init__(self, url, filename, is_ssl, single_line=0, premium_rate=8.00, rateofreturn=2.00):
+    def __init__(self, url, filename, is_ssl, write_in=0, send_email=0, premium_rate=8.00, rateofreturn=2.00):
         # 爬虫的url
         self.url = url
         # 保存内容的文件名
         self.filename = filename
         # 设置是否启用ssl
         self.ssl = is_ssl
-        # 设置获取哪些行
-        self.single_line = single_line
+        # 设置获是否写入文件
+        self.write_in = write_in
+        # 设置是否发送邮件
+        self.send_email = send_email
         # 设置预设筛选条件：溢价率和税前收益率
-        self.premium_rate = premium_rate;
-        self.rateofreturn = rateofreturn;
+        self.premium_rate = premium_rate
+        self.rateofreturn = rateofreturn
         # 定义xpath
-        #self.xpath = '//*[@id="flex_cb"]'
+        # self.xpath = '//*[@id="flex_cb"]'
         self.xpath = '/html/body/div[3]/div[1]/div[1]/table/tbody/tr'
         # Email地址和口令:
         self.from_addr = 'hellowhu@163.com'
@@ -82,18 +82,13 @@ class JSL:
     # 传入获取匹配的内容，把所需数据写入文件的方法
     def writeData(self, contents):
         file = open(self.filename, 'a')
-        if self.single_line == 1:
-            for index, content in enumerate(contents):
-                if index % 2 == 0:
-                    file.write(content + '\n')
-        elif self.single_line == 2:
-            for index, content in enumerate(contents):
-                if index % 2 == 1:
-                    file.write(content + '\n')
-        else:
+        if self.write_in == 1:
             for content in contents:
                 file.write(content + '\n')
-        file.close()
+            file.close()
+            print('Write in' + self.filename)
+        else:
+            print('No write in!')
 
     # 发送邮件方法
     def sendEmail(self, notice_contents):
@@ -129,15 +124,20 @@ class JSL:
             if line.split()[2] == "!":
                 rate1 = float(line.split()[11][:-1])  # 溢价率，取出百分号的数字,并转成float类型
                 rate2 = float(line.split()[21][:-1])  # 税前收益率，取出百分号的数字,并转成float类型
-                price = float(line.split()[3]) #当前价格
+                price = float(line.split()[3])  # 当前价格
+                score = round((rate1 - rate2), 2)
             else:
                 rate1 = float(line.split()[10][:-1])  # 溢价率，取出百分号的数字,并转成float类型
                 rate2 = float(line.split()[20][:-1])  # 税前收益率，取出百分号的数字,并转成float类型
                 price = float(line.split()[2])  # 当前价格
+                score = round((rate1 - rate2), 2)
             if rate1 < self.premium_rate and rate2 > self.rateofreturn:  # 根据预设条件进行筛选
-                notice_content = line.split()[0] + line.split()[1] \
-                                 + ' Price' + str(price) + ' Prenium rate:' + str(rate1)+'%' + ' EBIT:'+ str(rate2)+'%' +"\n"
+                notice_content = line.split()[0] + line.split()[1] + ' Price' + str(price) + ' Prenium rate:' + str(rate1)+'%' \
+                                 + ' EBIT:' + str(rate2)+'%' + ' Score:' + str(score)
+                print(notice_content)
+                notice_content = notice_content + "\n"
                 notice_contents.append(notice_content)
+        print('Finish!')
         return notice_contents
 
     # 开始方法
@@ -151,10 +151,13 @@ class JSL:
         else:
             notice_contents = self.myScreening(contents)
             if notice_contents:
-                self.sendEmail(notice_contents)
-                print("已发送邮件通知，请查收！")
+                if self.send_email == 1:
+                    self.sendEmail(notice_contents)
+                    print("已发送邮件通知，请查收！")
+                else:
+                    print('No need to send email!')
             self.writeData(contents)
-            print("内容已写入" + self.filename)
+            # print("内容已写入" + self.filename)
 
 
 
@@ -163,9 +166,9 @@ class JSL:
 # 传入url
 # 传入filename文件名
 # 传入is_ssl的值,1为使用ssl认证,0为禁用ssl认证
-# 传入single_line的值,1为获取单行数据,2为获取双行数据,默认为0获取所有数据
-#(url, filename, is_ssl, single_line=0, premium_rate=8.00, rateofreturn=2.00)
-jsl = JSL("https://www.jisilu.cn/data/cbnew/#cb", 'cb201905.txt', 0, 2, 8, 2)
+# 传入Write_in的值，1时写入，0时不写入
+# self, url, filename, is_ssl, write_in=0, send_email=0, premium_rate=8.00, rateofreturn=2.00
+jsl = JSL("https://www.jisilu.cn/data/cbnew/#cb", '20190517cb.txt', 0, 0, 0, 8, 2)
 # jsl = JSL("https://www.jisilu.cn/data/cf/#stock",'kkk2.txt', 0, 0)
 # jsl = JSL("https://www.jisilu.cn/data/sfnew/#tlink_3",'kkk2.txt', 0, 0)	#更改xpath为//*[@id="flex3"]/tbody/tr
 # 调用start方法

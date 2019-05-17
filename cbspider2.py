@@ -39,8 +39,8 @@ class JSL:
         # 设置获取哪些行
         self.single_line = single_line
         # 设置预设筛选条件：溢价率和税前收益率
-        self.premium_rate = premium_rate;
-        self.rateofreturn = rateofreturn;
+        self.premium_rate = premium_rate
+        self.rateofreturn = rateofreturn
         # 定义xpath
         #self.xpath = '//*[@id="flex_cb"]'
         self.xpath = '/html/body/div[3]/div[1]/div[1]/table/tbody/tr'
@@ -171,7 +171,7 @@ class JSL:
 # 传入filename文件名
 # 传入is_ssl的值,1为使用ssl认证,0为禁用ssl认证
 # 传入single_line的值,1为获取单行数据,2为获取双行数据,默认为0获取所有数据
-#(url, filename, is_ssl, single_line=0, premium_rate=8.00, rateofreturn=2.00)
+#(url, filename, is_ssl, write_in=0, premium_rate=8.00, rateofreturn=2.00)
 jsl = JSL("https://www.jisilu.cn/data/cbnew/#cb", 'cb201905.txt', 0, 2, 8, 2)
 # jsl = JSL("https://www.jisilu.cn/data/cf/#stock",'kkk2.txt', 0, 0)
 # jsl = JSL("https://www.jisilu.cn/data/sfnew/#tlink_3",'kkk2.txt', 0, 0)	#更改xpath为//*[@id="flex3"]/tbody/tr
