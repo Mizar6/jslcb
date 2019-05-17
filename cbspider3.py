@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # @Date    : 2019-05-06
 # @Author  : young
 # @Version : 0.1
@@ -12,11 +11,8 @@ from email.mime.text import MIMEText
 from email.header import Header
 from email.utils import parseaddr, formataddr
 import smtplib
-import datetime
-import os
-# import sys
-# reload(sys)
-# sys.setdefaultencoding('utf8')
+
+
 
 # 集思录爬虫类
 
@@ -50,7 +46,7 @@ class JSL:
         # SMTP服务器地址:
         self.smtp_server = 'smtp.163.com'
         # 收件人地址:
-        self.to_addr = 'hellowhu@qq.com'
+        self.to_addr = 'hellowhu@163.com'
         # 调用setSsl方法
         self.setSsl()
 
@@ -79,7 +75,7 @@ class JSL:
     def getContent(self, browser):
         contents = []  # 定义list,用于存储匹配的数据
         for tr in browser.find_elements_by_xpath(self.xpath):
-            content = tr.text.encode('utf-8')
+            content = tr.text
             contents.append(content)
         return contents
 
@@ -101,12 +97,6 @@ class JSL:
 
     # 发送邮件方法
     def sendEmail(self, notice_contents):
-        # 函数_format_addr()用来格式化一个邮件地址
-        def _format_addr(s):
-            name, addr = parseaddr(s)
-            return formataddr((
-                Header(name, 'utf-8').encode(),
-                addr.encode('utf-8') if isinstance(addr, unicode) else addr))
         # Email地址和口令:
         from_addr = self.from_addr
         password = self.password
@@ -117,10 +107,13 @@ class JSL:
         # 构造邮件
         msgtext = "\n".join(notice_contents)
         msg = MIMEText(msgtext, 'plain', 'utf-8')
-        msg['From'] = _format_addr(u'Spider_jisilu_4爬虫通知<%s>' % from_addr)
-        msg['To'] = _format_addr(u'管理员<%s>' % to_addr)
-        msg['Subject'] = Header(u'Hi...如下内容符合筛选条件:'
-                                +u'溢价率小于'+ str(self.premium_rate)+'%'+u',收益率大于'+str(self.rateofreturn)+'%', 'utf-8').encode()
+        fromText = 'spiderNotice ' + from_addr
+        toText = 'Admin ' + to_addr
+        msg['From'] = Header(fromText)
+        #msg['From'] = Header(from_addr)
+        msg['To'] = Header(toText)
+        #msg['To'] = Header(to_addr)
+        msg['Subject'] = Header('Convertible bond selected there:'+'Prenium rate<'+ str(self.premium_rate)+'%'+',EBIT>'+str(self.rateofreturn)+'%', 'utf-8')
 
         server = smtplib.SMTP_SSL(smtp_server, 465)  # 启用SSL发信, 端口一般是465
         # server = smtplib.SMTP(smtp_server, 25) 	# SMTP协议默认端口是25
@@ -143,7 +136,7 @@ class JSL:
                 price = float(line.split()[2])  # 当前价格
             if rate1 < self.premium_rate and rate2 > self.rateofreturn:  # 根据预设条件进行筛选
                 notice_content = line.split()[0] + line.split()[1] \
-                                 +' 当前价格'+str(price)+ ' 溢价率为' + str(rate1)+'%' +' 税前收益率为'+ str(rate2)+'%' +"\n"
+                                 + ' Price' + str(price) + ' Prenium rate:' + str(rate1)+'%' + ' EBIT:'+ str(rate2)+'%' +"\n"
                 notice_contents.append(notice_content)
         return notice_contents
 
@@ -153,15 +146,15 @@ class JSL:
         page = self.getPageSource(browser, self.url)
         contents = self.getContent(page)
         if not contents:
-            print u"获取内容失败,请确认URL是否正确"
+            print("获取内容失败,请确认URL是否正确")
             return
         else:
             notice_contents = self.myScreening(contents)
             if notice_contents:
                 self.sendEmail(notice_contents)
-                print u"已发送邮件通知，请查收！"
+                print("已发送邮件通知，请查收！")
             self.writeData(contents)
-            print "内容已写入" + self.filename
+            print("内容已写入" + self.filename)
 
 
 
